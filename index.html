@@ -201,8 +201,39 @@
   <aside class="filters">
     <h2>Filters</h2>
 
+    <div class="filter-group" data-filter-group="hardware">
+      <h3>Filter A: Hardware requirements</h3>
+      <small>Rough GPU/CPU demand level.</small>
+      <label class="filter-option">
+        <input type="checkbox" value="low"> Low
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="medium"> Medium
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="high"> High
+      </label>
+    </div>
+
+    <div class="filter-group" data-filter-group="engine">
+      <h3>Filter B: Game engine compatibility</h3>
+      <small>Where this technique is realistically deployable.</small>
+      <label class="filter-option">
+        <input type="checkbox" value="major"> Major engines (Unity/UE‑style)
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="custom"> Custom / in‑house engines
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="experimental"> Experimental / research / demoscene
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="legacy"> Legacy‑friendly / low‑end / fallback
+      </label>
+    </div>
+
     <div class="filter-group" data-filter-group="spectrum">
-      <h3>Filter A: Retained ↔ Immediate spectrum</h3>
+      <h3>Filter C: Retained ↔ Immediate spectrum</h3>
       <small>Select one or more D‑levels (OR within group, AND with other groups).</small>
       <label class="filter-option">
         <input type="checkbox" value="D1"> D1 – Fully retained GPU scene graph
@@ -233,37 +264,6 @@
       </label>
       <label class="filter-option">
         <input type="checkbox" value="D10"> D10 – CPU software rendering
-      </label>
-    </div>
-
-    <div class="filter-group" data-filter-group="hardware">
-      <h3>Filter B: Hardware requirements</h3>
-      <small>Rough GPU/CPU demand level.</small>
-      <label class="filter-option">
-        <input type="checkbox" value="low"> Low
-      </label>
-      <label class="filter-option">
-        <input type="checkbox" value="medium"> Medium
-      </label>
-      <label class="filter-option">
-        <input type="checkbox" value="high"> High
-      </label>
-    </div>
-
-    <div class="filter-group" data-filter-group="engine">
-      <h3>Filter C: Game engine compatibility</h3>
-      <small>Where this technique is realistically deployable.</small>
-      <label class="filter-option">
-        <input type="checkbox" value="major"> Major engines (Unity/UE‑style)
-      </label>
-      <label class="filter-option">
-        <input type="checkbox" value="custom"> Custom / in‑house engines
-      </label>
-      <label class="filter-option">
-        <input type="checkbox" value="experimental"> Experimental / research / demoscene
-      </label>
-      <label class="filter-option">
-        <input type="checkbox" value="legacy"> Legacy‑friendly / low‑end / fallback
       </label>
     </div>
 
