@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>3D Rendering Techniques Filter</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #111;
+      color: #eee;
+    }
+
+    header {
+      padding: 1.5rem 2rem;
+      background: #181818;
+      border-bottom: 1px solid #333;
+    }
+
+    header h1 {
+      margin: 0 0 0.25rem 0;
+      font-size: 1.4rem;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 1.5rem;
+      padding: 1.5rem 2rem;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .filters {
+      background: #181818;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      position: sticky;
+      top: 1rem;
+      max-height: calc(100vh - 3rem);
+      overflow-y: auto;
+    }
+
+    .filters h2 {
+      font-size: 1rem;
+      margin: 0 0 0.75rem 0;
+      border-bottom: 1px solid #333;
+      padding-bottom: 0.5rem;
+    }
+
+    .filter-group {
+      margin-bottom: 1rem;
+    }
+
+    .filter-group h3 {
+      font-size: 0.9rem;
+      margin: 0 0 0.4rem 0;
+      color: #ccc;
+    }
+
+    .filter-group small {
+      display: block;
+      font-size: 0.75rem;
+      color: #777;
+      margin-bottom: 0.25rem;
+    }
+
+    .filter-option {
+      display: flex;
+      align-items: center;
+      margin: 0.15rem 0;
+      font-size: 0.85rem;
+    }
+
+    .filter-option input {
+      margin-right: 0.4rem;
+    }
+
+    .filter-actions {
+      margin-top: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+
+    .filter-actions button {
+      background: #333;
+      color: #eee;
+      border: 1px solid #555;
+      border-radius: 4px;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .filter-actions button:hover {
+      background: #444;
+    }
+
+    .techniques {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .technique-card {
+      background: #181818;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 0.9rem 0.9rem 0.8rem 0.9rem;
+      transition: opacity 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .technique-card.dimmed {
+      opacity: 0.25;
+      border-color: #222;
+    }
+
+    .technique-card h3 {
+      margin: 0 0 0.35rem 0;
+      font-size: 0.95rem;
+    }
+
+    .technique-id {
+      font-size: 0.75rem;
+      color: #888;
+      margin-bottom: 0.35rem;
+    }
+
+    .technique-desc {
+      font-size: 0.8rem;
+      color: #ccc;
+      margin-bottom: 0.5rem;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .tag {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 999px;
+      border: 1px solid #444;
+      color: #ccc;
+      background: #202020;
+      white-space: nowrap;
+    }
+
+    .tag-spectrum {
+      border-color: #3b82f6;
+      color: #bfdbfe;
+    }
+
+    .tag-hw {
+      border-color: #22c55e;
+      color: #bbf7d0;
+    }
+
+    .tag-engine {
+      border-color: #eab308;
+      color: #fef9c3;
+    }
+
+    .status-line {
+      font-size: 0.75rem;
+      color: #888;
+      margin-top: 0.25rem;
+    }
+
+    .status-line strong {
+      color: #ddd;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>3D Rendering Techniques – Cross‑Cutting Filter View</h1>
+  <p>Filter techniques by data dynamism, hardware requirements, and engine compatibility. Non‑matching items are grayed out.</p>
+</header>
+
+<main>
+  <aside class="filters">
+    <h2>Filters</h2>
+
+    <div class="filter-group" data-filter-group="spectrum">
+      <h3>Filter A: Retained ↔ Immediate spectrum</h3>
+      <small>Select one or more D‑levels (OR within group, AND with other groups).</small>
+      <label class="filter-option">
+        <input type="checkbox" value="D1"> D1 – Fully retained GPU scene graph
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="D2"> D2 – Retained meshes, CPU transforms
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="D3"> D3 – Retained geometry, dynamic materials
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="D4"> D4 – GPU‑driven with CPU feedback
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="D5"> D5 – Mixed static + dynamic
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="D6"> D6 – CPU‑driven, retained buffers
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="D7"> D7 – Streaming geometry
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="D8"> D8 – GPU per‑frame geometry generation
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="D9"> D9 – CPU→GPU full rebuild
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="D10"> D10 – CPU software rendering
+      </label>
+    </div>
+
+    <div class="filter-group" data-filter-group="hardware">
+      <h3>Filter B: Hardware requirements</h3>
+      <small>Rough GPU/CPU demand level.</small>
+      <label class="filter-option">
+        <input type="checkbox" value="low"> Low
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="medium"> Medium
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="high"> High
+      </label>
+    </div>
+
+    <div class="filter-group" data-filter-group="engine">
+      <h3>Filter C: Game engine compatibility</h3>
+      <small>Where this technique is realistically deployable.</small>
+      <label class="filter-option">
+        <input type="checkbox" value="major"> Major engines (Unity/UE‑style)
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="custom"> Custom / in‑house engines
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="experimental"> Experimental / research / demoscene
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" value="legacy"> Legacy‑friendly / low‑end / fallback
+      </label>
+    </div>
+
+    <div class="filter-actions">
+      <button id="clearFilters">Clear all filters</button>
+      <span id="filterSummary">No filters active</span>
+    </div>
+  </aside>
+
+  <section class="techniques" id="techniquesContainer">
+    <!-- Cards injected by JS -->
+  </section>
+</main>
+
+<script>
+  // --- Data model: techniques derived from the document’s concepts ---
+  // You can extend or tweak this array freely.
+  const techniques = [
+    {
+      id: "D1",
+      name: "Fully Retained GPU Scene Graph",
+      description: "Entire world lives in GPU memory; GPU-driven rendering with minimal CPU involvement (Nanite-style, AAA engines).",
+      spectrumTags: ["D1"],
+      hardware: "high",
+      engineCompat: ["major", "custom"]
+    },
+    {
+      id: "D2",
+      name: "Retained Meshes, CPU Transform Updates",
+      description: "Meshes retained on GPU, CPU updates transforms and visibility; classic modern engine pattern.",
+      spectrumTags: ["D2"],
+      hardware: "medium",
+      engineCompat: ["major", "custom"]
+    },
+    {
+      id: "D3",
+      name: "Retained Geometry, Dynamic Materials",
+      description: "Stable geometry with frequently changing materials/textures; good for dynamic weather and time-of-day.",
+      spectrumTags: ["D3"],
+      hardware: "medium",
+      engineCompat: ["major", "custom"]
+    },
+    {
+      id: "D4",
+      name: "GPU-Driven with CPU Feedback",
+      description: "GPU handles visibility/physics, CPU reads back results for AI/gameplay; async and latency-sensitive.",
+      spectrumTags: ["D4"],
+      hardware: "high",
+      engineCompat: ["custom"]
+    },
+    {
+      id: "D5",
+      name: "Mixed Static + Dynamic World",
+      description: "Static background retained, dynamic entities updated frequently; common open-world compromise.",
+      spectrumTags: ["D5"],
+      hardware: "medium",
+      engineCompat: ["major", "custom"]
+    },
+    {
+      id: "D6",
+      name: "CPU-Driven Rendering, Retained Buffers",
+      description: "CPU builds command lists each frame but reuses GPU buffers; explicit and debuggable.",
+      spectrumTags: ["D6"],
+      hardware: "medium",
+      engineCompat: ["major", "custom", "legacy"]
+    },
+    {
+      id: "D7",
+      name: "Streaming Geometry",
+      description: "Continuously stream geometry based on camera position; good for massive worlds with limited memory.",
+      spectrumTags: ["D7"],
+      hardware: "medium",
+      engineCompat: ["major", "custom"]
+    },
+    {
+      id: "D8",
+      name: "GPU Per-Frame Geometry Generation",
+      description: "Compute shaders generate geometry each frame (e.g., voxel terrain, procedural meshes).",
+      spectrumTags: ["D8"],
+      hardware: "high",
+      engineCompat: ["custom", "experimental"]
+    },
+    {
+      id: "D9",
+      name: "CPU→GPU Full Rebuild (Immediate Mode)",
+      description: "CPU rebuilds all render data every frame; perfect visibility and debugging, bandwidth-limited.",
+      spectrumTags: ["D9"],
+      hardware: "medium",
+      engineCompat: ["major", "custom", "legacy"]
+    },
+    {
+      id: "D10",
+      name: "CPU Software Rendering",
+      description: "CPU renders directly to framebuffer; ultimate immediate mode, great for learning and fallbacks.",
+      spectrumTags: ["D10"],
+      hardware: "low",
+      engineCompat: ["experimental", "legacy"]
+    },
+    {
+      id: "IM1",
+      name: "Ray-Marched SDF Scene",
+      description: "Fullscreen ray-marched SDFs; scene defined as pure functions, no retained geometry.",
+      spectrumTags: ["D8", "D9"], // functionally immediate, GPU-heavy
+      hardware: "high",
+      engineCompat: ["experimental", "custom"]
+    },
+    {
+      id: "IM2",
+      name: "Compute-to-Render Direct Pipeline",
+      description: "Compute generates geometry, then rendered in the same frame; buffers reused or discarded.",
+      spectrumTags: ["D8"],
+      hardware: "high",
+      engineCompat: ["custom", "experimental"]
+    },
+    {
+      id: "IM3",
+      name: "Fullscreen Quad + Math",
+      description: "Single fullscreen quad with all scene logic in the fragment shader; minimal data, maximal math.",
+      spectrumTags: ["D8", "D9"],
+      hardware: "medium",
+      engineCompat: ["experimental", "custom"]
+    },
+    {
+      id: "IM4",
+      name: "Dear ImGui-Style Immediate UI",
+      description: "CPU builds UI every frame and uploads; classic immediate-mode pattern.",
+      spectrumTags: ["D9"],
+      hardware: "low",
+      engineCompat: ["major", "custom", "legacy"]
+    }
+  ];
+
+  // --- DOM references ---
+  const container = document.getElementById("techniquesContainer");
+  const clearButton = document.getElementById("clearFilters");
+  const filterSummary = document.getElementById("filterSummary");
+
+  const filterGroups = {
+    spectrum: document.querySelectorAll('[data-filter-group="spectrum"] input[type="checkbox"]'),
+    hardware: document.querySelectorAll('[data-filter-group="hardware"] input[type="checkbox"]'),
+    engine: document.querySelectorAll('[data-filter-group="engine"] input[type="checkbox"]')
+  };
+
+  // --- Render cards ---
+  function createTag(label, className) {
+    const span = document.createElement("span");
+    span.className = "tag " + className;
+    span.textContent = label;
+    return span;
+  }
+
+  function renderTechniques() {
+    container.innerHTML = "";
+    techniques.forEach(tech => {
+      const card = document.createElement("article");
+      card.className = "technique-card";
+      card.dataset.id = tech.id;
+      card.dataset.spectrum = tech.spectrumTags.join(",");
+      card.dataset.hardware = tech.hardware;
+      card.dataset.engine = tech.engineCompat.join(",");
+
+      const title = document.createElement("h3");
+      title.textContent = tech.name;
+
+      const idLine = document.createElement("div");
+      idLine.className = "technique-id";
+      idLine.textContent = tech.id;
+
+      const desc = document.createElement("p");
+      desc.className = "technique-desc";
+      desc.textContent = tech.description;
+
+      const tags = document.createElement("div");
+      tags.className = "tags";
+
+      tech.spectrumTags.forEach(s => {
+        tags.appendChild(createTag(s, "tag-spectrum"));
+      });
+
+      tags.appendChild(createTag("HW: " + tech.hardware, "tag-hw"));
+
+      tech.engineCompat.forEach(e => {
+        let label;
+        if (e === "major") label = "Major engines";
+        else if (e === "custom") label = "Custom engines";
+        else if (e === "experimental") label = "Experimental";
+        else if (e === "legacy") label = "Legacy-friendly";
+        else label = e;
+        tags.appendChild(createTag(label, "tag-engine"));
+      });
+
+      const status = document.createElement("div");
+      status.className = "status-line";
+      status.innerHTML = "<strong>Spectrum:</strong> " +
+        tech.spectrumTags.join(", ") +
+        " · <strong>HW:</strong> " + tech.hardware +
+        " · <strong>Engines:</strong> " + tech.engineCompat.join(", ");
+
+      card.appendChild(title);
+      card.appendChild(idLine);
+      card.appendChild(desc);
+      card.appendChild(tags);
+      card.appendChild(status);
+
+      container.appendChild(card);
+    });
+  }
+
+  // --- Filter logic ---
+  function getActiveFilters() {
+    const active = {
+      spectrum: [],
+      hardware: [],
+      engine: []
+    };
+
+    filterGroups.spectrum.forEach(cb => {
+      if (cb.checked) active.spectrum.push(cb.value);
+    });
+    filterGroups.hardware.forEach(cb => {
+      if (cb.checked) active.hardware.push(cb.value);
+    });
+    filterGroups.engine.forEach(cb => {
+      if (cb.checked) active.engine.push(cb.value);
+    });
+
+    return active;
+  }
+
+  function updateFilterSummary(active) {
+    const parts = [];
+    if (active.spectrum.length) {
+      parts.push("Spectrum: " + active.spectrum.join(", "));
+    }
+    if (active.hardware.length) {
+      parts.push("HW: " + active.hardware.join(", "));
+    }
+    if (active.engine.length) {
+      parts.push("Engines: " + active.engine.join(", "));
+    }
+    filterSummary.textContent = parts.length ? parts.join(" · ") : "No filters active";
+  }
+
+  function applyFilters() {
+    const active = getActiveFilters();
+    updateFilterSummary(active);
+
+    const cards = container.querySelectorAll(".technique-card");
+
+    cards.forEach(card => {
+      let matches = true;
+
+      // Spectrum: OR within group, AND across groups
+      if (active.spectrum.length) {
+        const cardSpectrum = (card.dataset.spectrum || "").split(",").filter(Boolean);
+        const hasAny = active.spectrum.some(tag => cardSpectrum.includes(tag));
+        if (!hasAny) matches = false;
+      }
+
+      if (active.hardware.length) {
+        const hw = card.dataset.hardware;
+        if (!active.hardware.includes(hw)) matches = false;
+      }
+
+      if (active.engine.length) {
+        const cardEngines = (card.dataset.engine || "").split(",").filter(Boolean);
+        const hasAnyEngine = active.engine.some(tag => cardEngines.includes(tag));
+        if (!hasAnyEngine) matches = false;
+      }
+
+      if (matches) {
+        card.classList.remove("dimmed");
+      } else {
+        card.classList.add("dimmed");
+      }
+    });
+  }
+
+  // --- Event wiring ---
+  Object.values(filterGroups).forEach(nodeList => {
+    nodeList.forEach(cb => {
+      cb.addEventListener("change", applyFilters);
+    });
+  });
+
+  clearButton.addEventListener("click", () => {
+    Object.values(filterGroups).forEach(nodeList => {
+      nodeList.forEach(cb => {
+        cb.checked = false;
+      });
+    });
+    applyFilters();
+  });
+
+  // --- Init ---
+  renderTechniques();
+  applyFilters();
+</script>
+</body>
+</html>
